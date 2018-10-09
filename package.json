@@ -3,10 +3,9 @@
     "name": "nabbl"
   },
   "bugs": {
-    "url": "https://github.com/srfrnk/ng-device-detector/issues"
+    "url": "https://github.com/nabbl/webpack-angular-templatecache/issues"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "deprecated": false,
   "description": "Uses user-agent to set css classes or directly usable via JS.",
   "devDependencies": {
