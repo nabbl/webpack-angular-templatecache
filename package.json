@@ -1,0 +1,33 @@
+{
+  "author": {
+    "name": "nabbl"
+  },
+  "bugs": {
+    "url": "https://github.com/srfrnk/ng-device-detector/issues"
+  },
+  "dependencies": {
+  },
+  "deprecated": false,
+  "description": "Uses user-agent to set css classes or directly usable via JS.",
+  "devDependencies": {
+    "html-minifier": "^3.5.20"
+  },
+  "homepage": "https://github.com/nabbl/webpack-angular-templatecache",
+  "keywords": [
+    "angularjs",
+    "templatecache"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "webpack-angular-templatecache",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nabbl/webpack-angular-templatecache.git"
+  },
+  "scripts": {
+    "publish-version": "(git push --follow-tags origin master) && (npm publish)",
+    "release": "node_modules/standard-version/bin/cli.js",
+    "test": "./node_modules/karma/bin/karma start --single-run --browsers PhantomJS"
+  },
+  "version": "0.0.1"
+}
