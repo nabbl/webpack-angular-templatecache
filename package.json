@@ -7,7 +7,7 @@
   },
   "dependencies": {},
   "deprecated": false,
-  "description": "Uses user-agent to set css classes or directly usable via JS.",
+  "description": "Creates an angularJS templateCache templates.js file from all html files and adds it to the index.html.",
   "devDependencies": {
     "html-minifier": "^3.5.20"
   },
