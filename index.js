@@ -29,10 +29,10 @@ class TemplateCachePlugin {
 
             for (var filename of files) {
               if (filename.substr(-4) === 'html') {
-
+                let fullpath = path.resolve(filename);
                 // adds this file to being watched by webpack for a rebuild
-                compilation.fileDependencies.add(filename);
-                var source = fs.readFileSync(filename);
+                compilation.fileDependencies.add(fullpath);
+                let source = fs.readFileSync(filename);
                 source = source.toString();
                 source = htmlMinifier.minify(source, minifyOptions);
                 source = source.replace(/\r?\n|\r/g, "");
