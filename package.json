@@ -28,5 +28,5 @@
     "release": "node_modules/standard-version/bin/cli.js",
     "test": "./node_modules/karma/bin/karma start --single-run --browsers PhantomJS"
   },
-  "version": "0.1.1"
+  "version": "0.1.2"
 }
