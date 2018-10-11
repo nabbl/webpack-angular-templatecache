@@ -1,4 +1,9 @@
-var htmlMinifier = require("html-minifier");
+const htmlMinifier = require("html-minifier");
+const glob = require("glob");
+const fs = require("fs");
+const Chunk = require('webpack/lib/Chunk');
+const EntryPoint = require('webpack/lib/Entrypoint');
+const RawSource = require('webpack-sources/lib/RawSource');
 
 class TemplateCachePlugin {
 
@@ -12,41 +17,55 @@ class TemplateCachePlugin {
       preserveLineBreaks: false
     }
 
-    compiler.hooks.additionalAssets.tapAsync.tapAsync(
+    compiler.hooks.compilation.tap(
       'TemplateCachePlugin',
-      (compilation, callback) => {
-        // Manipulate the build using the plugin API provided by webpack
-        // Create a header string for the generated file:
+      (compilation) => {
+        compilation.hooks.additionalAssets.tapAsync(
+          'TemplateCachePlugin',
+          (cb) => {
+            var filelist = 'angular.module("easySales").run(["$templateCache",function($templateCache){"use strict";';
 
-        var filelist = 'angular.module("easySales").run(["$templateCache",function($templateCache){"use strict";';
-        // Loop through all compiled assets,
-        for (var filename in compilation.assets) {
-          if (filename.substr(-4) === 'html') {
-            var source = compilation.assets[filename].source();
-            source = source.toString();
-            source = htmlMinifier.minify(source, minifyOptions);
-            source = source.replace(/\r?\n|\r/g, "");
-            source = source.replace(/'/g, "\\'");
-            source = source.replace(/"/g, "\\\"");
-            filelist += (`$templateCache.put("${ filename }", "${ source }" ); `);
-            //remove HTML files
-            delete compilation.assets[filename];
-          }
-        }
+            var files = glob.sync("app/{scripts,views}/**/*.html", {});
 
-        filelist += '}]);';
+            for (var filename of files) {
+              if (filename.substr(-4) === 'html') {
 
-        // Insert this list into the Webpack build as a new file asset:
-        compilation.assets['templates.js'] = {
-          source: function () {
-            return filelist;
-          },
-          size: function () {
-            return filelist.length;
-          }
-        };
-        callback();
+                // adds this file to being watched by webpack for a rebuild
+                compilation.fileDependencies.add(filename);
+                var source = fs.readFileSync(filename);
+                source = source.toString();
+                source = htmlMinifier.minify(source, minifyOptions);
+                source = source.replace(/\r?\n|\r/g, "");
+                source = source.replace(/'/g, "\\'");
+                source = source.replace(/"/g, "\\\"");
+                filename = filename.substring(4, filename.length);
+                filelist += (`$templateCache.put("${ filename }", "${ source }" ); \n`);
+              }
+            }
+
+            filelist += '}]);';
+
+            // Insert this list into the Webpack build as a new file asset:
+            this._insertOutput(compilation, 'templates.js', filelist);
+
+            cb();
+          });
+
       });
+  }
+
+  _insertOutput(compilation, filename, source) {
+    const chunk = new Chunk("templates.js");
+    chunk.id = "templates.js";
+    chunk.ids = [chunk.id];
+    chunk.files.push(filename);
+
+    const entrypoint = new EntryPoint("templates.js");
+    entrypoint.pushChunk(chunk);
+
+    compilation.entrypoints.set("templates.js", entrypoint);
+    compilation.chunks.push(chunk);
+    compilation.assets[filename] = new RawSource(source);
   }
 }
 
