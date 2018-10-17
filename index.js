@@ -9,7 +9,6 @@ const path = require('path');
 class TemplateCachePlugin {
 
   constructor(options) {
-    options.target = options.target || '';
     this.options = options;
   }
   apply(compiler) {
@@ -41,7 +40,14 @@ class TemplateCachePlugin {
                 source = source.replace(/\r?\n|\r/g, "");
                 source = source.replace(/'/g, "\\'");
                 source = source.replace(/"/g, "\\\"");
-                filename = this.options.target + path.basename(filename);
+                // remove basefolder we dont want to have in path
+                if (this.options.base) {
+                  filename = filename.substring(this.options.base.length, filename.length);
+                }
+                // if we have a target put all the files directly there
+                if (this.options.target) {
+                  filename = this.options.target + path.basename(filename);
+                }
                 filelist += (`$templateCache.put("${ filename }", "${ source }" ); \n`);
               }
             }
