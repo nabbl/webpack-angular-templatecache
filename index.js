@@ -4,11 +4,14 @@ const fs = require("fs");
 const Chunk = require('webpack/lib/Chunk');
 const EntryPoint = require('webpack/lib/Entrypoint');
 const RawSource = require('webpack-sources/lib/RawSource');
+const path = require('path');
 
 class TemplateCachePlugin {
 
-
-  constructor(options) {}
+  constructor(options) {
+    options.target = options.target || '';
+    this.options = options;
+  }
   apply(compiler) {
 
     var minifyOptions = {
@@ -23,22 +26,22 @@ class TemplateCachePlugin {
         compilation.hooks.additionalAssets.tapAsync(
           'TemplateCachePlugin',
           (cb) => {
-            var filelist = 'angular.module("easySales").run(["$templateCache",function($templateCache){"use strict";';
+            var filelist = 'angular.module("' + this.options.moduleName + '").run(["$templateCache",function($templateCache){"use strict";';
 
-            var files = glob.sync("app/{scripts,views}/**/*.html", {});
+            var files = glob.sync(this.options.baseFolder + "**/*.html", {});
 
             for (var filename of files) {
               if (filename.substr(-4) === 'html') {
                 let fullpath = path.resolve(filename);
                 // adds this file to being watched by webpack for a rebuild
                 compilation.fileDependencies.add(fullpath);
-                let source = fs.readFileSync(filename);
+                var source = fs.readFileSync(filename);
                 source = source.toString();
                 source = htmlMinifier.minify(source, minifyOptions);
                 source = source.replace(/\r?\n|\r/g, "");
                 source = source.replace(/'/g, "\\'");
                 source = source.replace(/"/g, "\\\"");
-                filename = filename.substring(4, filename.length);
+                filename = this.options.target + path.basename(filename);
                 filelist += (`$templateCache.put("${ filename }", "${ source }" ); \n`);
               }
             }
