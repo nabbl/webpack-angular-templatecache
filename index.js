@@ -38,6 +38,7 @@ class TemplateCachePlugin {
                 source = source.toString();
                 source = htmlMinifier.minify(source, minifyOptions);
                 source = source.replace(/\r?\n|\r/g, "");
+                source = source.replace(/\\/g, "\\\\");
                 source = source.replace(/'/g, "\\'");
                 source = source.replace(/"/g, "\\\"");
                 // remove basefolder we dont want to have in path
