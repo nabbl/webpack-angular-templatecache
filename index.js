@@ -13,8 +13,8 @@ class TemplateCachePlugin {
   }
   apply(compiler) {
 
-    var minifyOptions = {
-      collapseBooleanAttributes: true,
+    var defaultMinifyOptions = {
+      collapseBooleanAttributes: false,
       collapseWhitespace: true,
       preserveLineBreaks: false
     }
@@ -36,7 +36,7 @@ class TemplateCachePlugin {
                 compilation.fileDependencies.add(fullpath);
                 var source = fs.readFileSync(filename);
                 source = source.toString();
-                source = htmlMinifier.minify(source, minifyOptions);
+                source = htmlMinifier.minify(source, Object.assign(defaultMinifyOptions, this.options.minifyOptions));
                 source = source.replace(/\r?\n|\r/g, "");
                 source = source.replace(/\\/g, "\\\\");
                 source = source.replace(/'/g, "\\'");
